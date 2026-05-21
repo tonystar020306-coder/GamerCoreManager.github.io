@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamerCore Manager</title>
+    <style>
+        /* ========== ESTILOS GLOBALES ========== */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #000000, #120000, #1f0000);
+            font-family: Consolas, monospace;
+            color: white;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(255, 0, 0, 0.15), transparent 40%);
+            z-index: -1;
+        }
+
+        /* ========== LOGIN ========== */
+        #login {
+            width: 340px;
+            margin: auto;
+            margin-top: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(15, 15, 15, 0.95);
+            padding: 35px;
+            border-radius: 15px;
+            border: 1px solid red;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: red;
+            text-shadow: 0 0 10px red;
+            letter-spacing: 2px;
+        }
+
+        input {
+            padding: 14px;
+            background-color: #111;
+            color: white;
+            border: 1px solid red;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px red;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff0000, #990000);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+
+        button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px red;
+        }
+
+        /* ========== SISTEMA PRINCIPAL ========== */
+        .contenedor {
+            display: none;
+            justify-content: center;
+            gap: 40px;
+            padding: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* ========== PANEL CONFIGURADOR ========== */
+        .panel {
+            width: 340px;
+            max-height: 900px;
+            overflow-y: auto;
+            padding: 25px;
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 15px;
+            border: 1px solid red;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .panel::-webkit-scrollbar-thumb {
+            background-color: red;
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: red;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            background-color: #111;
+            color: white;
+            border: 1px solid red;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        select:hover {
+            box-shadow: 0 0 10px red;
+        }
+
+        /* ========== RESULTADO ========== */
+        .resultado {
+            width: 650px;
+            min-height: 700px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid red;
+            border-radius: 15px;
+            padding: 25px;
+            color: #ff4d4d;
+            white-space: pre-line;
+            font-size: 18px;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.25);
+        }
+
+        /* ========== COMPATIBILIDAD ========== */
+        .compat-ok {
+            background: rgba(0, 80, 0, 0.3);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            color: #00ff88;
+            font-size: 14px;
+        }
+
+        .compat-warn {
+            background: rgba(120, 60, 0, 0.3);
+            border: 1px solid #ffaa00;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            color: #ffaa00;
+            font-size: 14px;
+        }
+
+        .compat-error {
+            background: rgba(120, 0, 0, 0.3);
+            border: 1px solid #ff4444;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            color: #ff4444;
+            font-size: 14px;
+        }
+
+        /* ========== HISTORIAL ========== */
+        .historial-panel {
+            width: 340px;
+            max-height: 900px;
+            overflow-y: auto;
+            padding: 25px;
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 15px;
+            border: 1px solid #550000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.15);
+        }
+
+        .historial-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .historial-panel::-webkit-scrollbar-thumb {
+            background-color: #880000;
+            border-radius: 10px;
+        }
+
+        .historial-item {
+            background: rgba(30, 0, 0, 0.8);
+            border: 1px solid #550000;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .historial-item:hover {
+            border-color: red;
+        }
+
+        .historial-item .h-title {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .historial-item .h-fecha {
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .historial-item .h-comp {
+            color: #aaa;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .historial-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-cargar {
+            flex: 1;
+            padding: 6px;
+            margin-top: 0;
+            font-size: 12px;
+            background: linear-gradient(45deg, #880000, #440000);
+        }
+
+        .btn-borrar {
+            width: 36px;
+            padding: 6px;
+            margin-top: 0;
+            font-size: 12px;
+            background: rgba(60, 0, 0, 0.8);
+            border: 1px solid #550000;
+        }
+
+        .btn-borrar:hover {
+            background: rgba(120, 0, 0, 0.8);
+        }
+
+        .no-historial {
+            color: #555;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .contenedor {
+                flex-direction: column;
+                align-items: center;
+            }
+            .resultado {
+                width: 90%;
+            }
+            .historial-panel {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="login">
+        <h1>LOGIN GAMERCORE</h1>
+        <input type="text" id="usuario" placeholder="Usuario">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="iniciarSesion()">ENTRAR</button>
+        <button onclick="registrarUsuario()">REGISTRARSE</button>
+    </div>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div class="contenedor" id="sistema">
+
+        <!-- PANEL CONFIGURADOR -->
+        <div class="panel">
+            <h1>GAMERCORE MANAGER</h1>
+
+            <label>CPU</label>
+            <select id="cpu">
+                <option value="">-- Seleccione un CPU --</option>
+                <option>Athlon 3000G</option>
+                <option>Ryzen 3 2200G</option>
+                <option>Ryzen 3 3200G</option>
+                <option>Ryzen 3 4100</option>
+                <option>Ryzen 5 3600</option>
+                <option>Ryzen 5 4600G</option>
+                <option>Ryzen 5 5500</option>
+                <option>Ryzen 5 5600X</option>
+                <option>Ryzen 7 5700X</option>
+                <option>Ryzen 7 5800X3D</option>
+                <option>Ryzen 7 7700X</option>
+                <option>Ryzen 7 7800X3D</option>
+                <option>Ryzen 9 7900X</option>
+                <option>Ryzen 9 7950X</option>
+                <option>Ryzen 9 9950X</option>
+                <option>Intel i3 10100F</option>
+                <option>Intel i3 12100F</option>
+                <option>Intel i5 10400F</option>
+                <option>Intel i5 12400F</option>
+                <option>Intel i5 13400F</option>
+                <option>Intel i5 14600K</option>
+                <option>Intel i7 12700K</option>
+                <option>Intel i7 13700K</option>
+                <option>Intel i7 14700K</option>
+                <option>Intel i9 13900K</option>
+                <option>Intel i9 14900K</option>
+            </select>
+
+            <label>GPU</label>
+            <select id="gpu">
+                <option value="">-- Seleccione una GPU --</option>
+                <option>GT 1030</option>
+                <option>GTX 1050 Ti</option>
+                <option>GTX 1650</option>
+                <option>GTX 1660 Super</option>
+                <option>RTX 2060</option>
+                <option>RTX 3050</option>
+                <option>RTX 3060</option>
+                <option>RTX 3060 Ti</option>
+                <option>RTX 3070</option>
+                <option>RTX 4060</option>
+                <option>RTX 4060 Ti</option>
+                <option>RTX 4070</option>
+                <option>RTX 4070 Super</option>
+                <option>RTX 4080</option>
+                <option>RTX 4090</option>
+                <option>RX 570</option>
+                <option>RX 580</option>
+                <option>RX 6400</option>
+                <option>RX 6600</option>
+                <option>RX 6700 XT</option>
+                <option>RX 6750 XT</option>
+                <option>RX 7600</option>
+                <option>RX 7700 XT</option>
+                <option>RX 7800 XT</option>
+                <option>RX 7900 XT</option>
+                <option>RX 7900 XTX</option>
+            </select>
+
+            <label>RAM</label>
+            <select id="ram">
+                <option value="">-- Seleccione una RAM --</option>
+                <option>4GB DDR4 2400MHz</option>
+                <option>8GB DDR4 2666MHz</option>
+                <option>8GB DDR4 3200MHz</option>
+                <option>16GB DDR4 3200MHz</option>
+                <option>16GB DDR4 RGB 3600MHz</option>
+                <option>32GB DDR4 3600MHz</option>
+                <option>32GB DDR5 5200MHz</option>
+                <option>32GB DDR5 RGB 6000MHz</option>
+                <option>64GB DDR5 6000MHz</option>
+                <option>64GB DDR5 RGB 7200MHz</option>
+                <option>96GB DDR5 RGB 7200MHz</option>
+            </select>
+
+            <label>MOTHERBOARD</label>
+            <select id="mb">
+                <option value="">-- Seleccione una Motherboard --</option>
+                <option>A320M</option>
+                <option>B450M</option>
+                <option>B550 Gaming</option>
+                <option>X570 AORUS</option>
+                <option>B650 Gaming Plus</option>
+                <option>X670 AORUS Elite</option>
+                <option>H510M</option>
+                <option>H610M</option>
+                <option>B660M</option>
+                <option>Z690 Gaming</option>
+                <option>Z790 ROG STRIX</option>
+            </select>
+
+            <label>FUENTE</label>
+            <select id="fuente">
+                <option value="">-- Seleccione una Fuente --</option>
+                <option>500W</option>
+                <option>550W Bronze</option>
+                <option>650W Bronze</option>
+                <option>750W Gold</option>
+                <option>850W Gold</option>
+                <option>1000W Platinum</option>
+                <option>1200W Titanium</option>
+            </select>
+
+            <label>SSD</label>
+            <select id="ssd">
+                <option value="">-- Seleccione un SSD --</option>
+                <option>120GB SATA</option>
+                <option>240GB SATA</option>
+                <option>480GB SATA</option>
+                <option>500GB NVME</option>
+                <option>1TB NVME</option>
+                <option>2TB NVME</option>
+                <option>Kingston NV2 1TB</option>
+                <option>Samsung 980 PRO 1TB</option>
+                <option>WD Black SN850X 2TB</option>
+                <option>Samsung 990 PRO 4TB</option>
+            </select>
+
+            <!-- COMPATIBILIDAD EN VIVO -->
+            <div id="compat-live" style="margin-top:15px;"></div>
+
+            <button onclick="armarPC()">ARMAR PC</button>
+            <button onclick="cerrarSistema()">CERRAR SISTEMA</button>
+        </div>
+
+        <!-- RESULTADO -->
+        <div class="resultado" id="resultado">
+            ===== GAMERCORE MANAGER =====
+            Selecciona los componentes para comenzar.
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="historial-panel">
+            <h1 style="font-size:18px;">HISTORIAL</h1>
+            <div id="historial-lista">
+                <p class="no-historial">Sin configuraciones guardadas.</p>
+            </div>
+            <button onclick="limpiarHistorial()" style="background:linear-gradient(45deg,#330000,#220000);margin-top:10px;">LIMPIAR TODO</button>
+        </div>
+
+    </div>
+
+    <script>
+        /* ========== DATOS DE COMPATIBILIDAD ========== */
+        const cpuSocket = {
+            "Athlon 3000G": "AM4", "Ryzen 3 2200G": "AM4", "Ryzen 3 3200G": "AM4", "Ryzen 3 4100": "AM4",
+            "Ryzen 5 3600": "AM4", "Ryzen 5 4600G": "AM4", "Ryzen 5 5500": "AM4", "Ryzen 5 5600X": "AM4",
+            "Ryzen 7 5700X": "AM4", "Ryzen 7 5800X3D": "AM4", "Ryzen 7 7700X": "AM5", "Ryzen 7 7800X3D": "AM5",
+            "Ryzen 9 7900X": "AM5", "Ryzen 9 7950X": "AM5", "Ryzen 9 9950X": "AM5",
+            "Intel i3 10100F": "LGA1200", "Intel i3 12100F": "LGA1700",
+            "Intel i5 10400F": "LGA1200", "Intel i5 12400F": "LGA1700", "Intel i5 13400F": "LGA1700",
+            "Intel i5 14600K": "LGA1700", "Intel i7 12700K": "LGA1700", "Intel i7 13700K": "LGA1700",
+            "Intel i7 14700K": "LGA1700", "Intel i9 13900K": "LGA1700", "Intel i9 14900K": "LGA1700"
+        };
+
+        const mbSocket = {
+            "A320M": "AM4", "B450M": "AM4", "B550 Gaming": "AM4", "X570 AORUS": "AM4",
+            "B650 Gaming Plus": "AM5", "X670 AORUS Elite": "AM5",
+            "H510M": "LGA1200", "H610M": "LGA1700", "B660M": "LGA1700", "Z690 Gaming": "LGA1700",
+            "Z790 ROG STRIX": "LGA1700"
+        };
+
+        const mbRam = {
+            "A320M": "DDR4", "B450M": "DDR4", "B550 Gaming": "DDR4", "X570 AORUS": "DDR4",
+            "B650 Gaming Plus": "DDR5", "X670 AORUS Elite": "DDR5",
+            "H510M": "DDR4", "H610M": "DDR4", "B660M": "DDR4", "Z690 Gaming": "DDR4",
+            "Z790 ROG STRIX": "DDR5"
+        };
+
+        const gpuWatts = {
+            "GT 1030": 300, "GTX 1050 Ti": 350, "GTX 1650": 350, "GTX 1660 Super": 450,
+            "RTX 2060": 500, "RTX 3050": 450, "RTX 3060": 550, "RTX 3060 Ti": 600, "RTX 3070": 650,
+            "RTX 4060": 550, "RTX 4060 Ti": 600, "RTX 4070": 650, "RTX 4070 Super": 700,
+            "RTX 4080": 750, "RTX 4090": 850,
+            "RX 570": 450, "RX 580": 500, "RX 6400": 350,
+            "RX 6600": 500, "RX 6700 XT": 600, "RX 6750 XT": 650, "RX 7600": 550,
+            "RX 7700 XT": 650, "RX 7800 XT": 700, "RX 7900 XT": 750, "RX 7900 XTX": 800
+        };
+
+        const fuenteWatts = {
+            "500W": 500, "550W Bronze": 550, "650W Bronze": 650, "750W Gold": 750,
+            "850W Gold": 850, "1000W Platinum": 1000, "1200W Titanium": 1200
+        };
+
+        const cpuHighTDP = ["Ryzen 9 7900X", "Ryzen 9 7950X", "Ryzen 9 9950X", "Intel i9 13900K", "Intel i9 14900K", "Intel i7 14700K"];
+
+        /* ========== VERIFICAR COMPATIBILIDAD ========== */
+        function verificarCompatibilidad(cpu, gpu, ram, mb, fuente) {
+            let errores = [];
+            let advertencias = [];
+
+            if (cpu && mb) {
+                let sockCPU = cpuSocket[cpu];
+                let sockMB = mbSocket[mb];
+                if (sockCPU && sockMB && sockCPU !== sockMB) {
+                    errores.push("⛔ Socket incompatible: " + cpu + " usa " + sockCPU + " pero " + mb + " es " + sockMB);
+                }
+            }
+
+            if (ram && mb) {
+                let ramTipo = ram.includes("DDR5") ? "DDR5" : "DDR4";
+                let mbTipo = mbRam[mb];
+                if (mbTipo && ramTipo !== mbTipo) {
+                    errores.push("⛔ RAM incompatible: " + mb + " soporta " + mbTipo + " pero seleccionaste " + ramTipo);
+                }
+                let sockMB = mbSocket[mb];
+                if (ramTipo === "DDR5" && (sockMB === "AM4" || sockMB === "LGA1200")) {
+                    errores.push("⛔ DDR5 no es compatible con plataformas AM4/LGA1200");
+                }
+            }
+
+            if (gpu && fuente) {
+                let wGPU = gpuWatts[gpu] || 0;
+                let wFuente = fuenteWatts[fuente] || 0;
+                let wNecesario = wGPU + (cpuHighTDP.includes(cpu) ? 100 : 50);
+                if (wFuente < wNecesario) {
+                    errores.push("⛔ Fuente insuficiente: " + gpu + " necesita ~" + wNecesario + "W, tienes " + wFuente + "W");
+                } else if (wFuente < wNecesario + 100) {
+                    advertencias.push("⚠️ Fuente ajustada: recomendado tener más margen para " + gpu);
+                }
+            }
+
+            if (cpu && gpu) {
+                let cuello = detectarCuello(cpu, gpu);
+                if (cuello) advertencias.push("⚠️ " + cuello);
+            }
+
+            if (ram && (ram.startsWith("4GB") || ram.startsWith("8GB"))) {
+                advertencias.push("⚠️ RAM baja: 8GB o menos puede limitar el rendimiento en juegos modernos");
+            }
+
+            return { errores, advertencias };
+        }
+
+        function detectarCuello(cpu, gpu) {
+            const gpuGama = {
+                "GT 1030": 1, "GTX 1050 Ti": 2, "GTX 1650": 2, "GTX 1660 Super": 3,
+                "RTX 2060": 3, "RTX 3050": 3, "RTX 3060": 4, "RTX 3060 Ti": 4, "RTX 3070": 5,
+                "RTX 4060": 4, "RTX 4060 Ti": 5, "RTX 4070": 5, "RTX 4070 Super": 6,
+                "RTX 4080": 7, "RTX 4090": 8,
+                "RX 570": 2, "RX 580": 3, "RX 6400": 2, "RX 6600": 3, "RX 6700 XT": 4,
+                "RX 6750 XT": 5, "RX 7600": 4, "RX 7700 XT": 5, "RX 7800 XT": 5,
+                "RX 7900 XT": 6, "RX 7900 XTX": 7
+            };
+            const cpuGama = {
+                "Athlon 3000G": 1, "Ryzen 3 2200G": 1, "Ryzen 3 3200G": 1, "Ryzen 3 4100": 2,
+                "Ryzen 5 3600": 3, "Ryzen 5 4600G": 3, "Ryzen 5 5500": 3, "Ryzen 5 5600X": 4,
+                "Ryzen 7 5700X": 5, "Ryzen 7 5800X3D": 6, "Ryzen 7 7700X": 5, "Ryzen 7 7800X3D": 7,
+                "Ryzen 9 7900X": 6, "Ryzen 9 7950X": 7, "Ryzen 9 9950X": 8,
+                "Intel i3 10100F": 2, "Intel i3 12100F": 3,
+                "Intel i5 10400F": 3, "Intel i5 12400F": 4, "Intel i5 13400F": 4, "Intel i5 14600K": 5,
+                "Intel i7 12700K": 5, "Intel i7 13700K": 6, "Intel i7 14700K": 6,
+                "Intel i9 13900K": 7, "Intel i9 14900K": 7
+            };
+            let gc = cpuGama[cpu] || 3;
+            let gg = gpuGama[gpu] || 3;
+            if (gg - gc >= 3) return "Posible cuello de botella en CPU: el procesador podría limitar la GPU";
+            if (gc - gg >= 3) return "CPU sobredimensionado para esta GPU: considera una GPU más potente";
+            return null;
+        }
+
+        /* ========== COMPATIBILIDAD EN VIVO ========== */
+        function actualizarCompatLive() {
+            let cpu = document.getElementById("cpu").value;
+            let gpu = document.getElementById("gpu").value;
+            let ram = document.getElementById("ram").value;
+            let mb = document.getElementById("mb").value;
+            let fuente = document.getElementById("fuente").value;
+            let div = document.getElementById("compat-live");
+
+            if (!cpu && !gpu && !ram && !mb && !fuente) {
+                div.innerHTML = "";
+                return;
+            }
+
+            let { errores, advertencias } = verificarCompatibilidad(cpu, gpu, ram, mb, fuente);
+            let html = "";
+            errores.forEach(e => html += '<div class="compat-error">' + e + '</div>');
+            advertencias.forEach(a => html += '<div class="compat-warn">' + a + '</div>');
+            if (errores.length === 0 && advertencias.length === 0 && cpu && gpu && ram && mb && fuente) {
+                html = '<div class="compat-ok">✅ Todos los componentes son compatibles</div>';
+            }
+            div.innerHTML = html;
+        }
+
+        ["cpu", "gpu", "ram", "mb", "fuente", "ssd"].forEach(id => {
+            document.getElementById(id).addEventListener("change", actualizarCompatLive);
+        });
+
+        /* ========== ARMAR PC ========== */
+        function armarPC() {
+            let cpu = document.getElementById("cpu").value;
+            let gpu = document.getElementById("gpu").value;
+            let ram = document.getElementById("ram").value;
+            let mb = document.getElementById("mb").value;
+            let fuente = document.getElementById("fuente").value;
+            let ssd = document.getElementById("ssd").value;
+
+            if (!cpu || !gpu || !ram || !mb || !fuente || !ssd) {
+                alert("Selecciona todos los componentes");
+                return;
+            }
+
+            let { errores, advertencias } = verificarCompatibilidad(cpu, gpu, ram, mb, fuente);
+
+            if (errores.length > 0) {
+                alert("⛔ ERRORES DE COMPATIBILIDAD:\n\n" + errores.join("\n") + "\n\nCorrige los errores antes de continuar.");
+                return;
+            }
+
+            let precio = Math.floor(Math.random() * 30000) + 10000;
+            let consumo = Math.floor(Math.random() * 500) + 200;
+            let valorant = Math.floor(Math.random() * 250) + 120;
+            let warzone = Math.floor(Math.random() * 120) + 60;
+            let fortnite = Math.floor(Math.random() * 180) + 90;
+            let tempCPU = Math.floor(Math.random() * 10) + 60;
+            let tempGPU = Math.floor(Math.random() * 10) + 70;
+
+            let compatTexto = advertencias.length === 0
+                ? "COMPONENTES COMPATIBLES ✅"
+                : "ADVERTENCIAS:\n" + advertencias.join("\n");
+
+            let resultado =
+                `===== PC GAMER =====
+
+CPU:
+${cpu}
+
+GPU:
+${gpu}
+
+RAM:
+${ram}
+
+Motherboard:
+${mb}
+
+Fuente:
+${fuente}
+
+SSD:
+${ssd}
+
+===== INFORMACIÓN =====
+
+Precio Total:
+$${precio}
+
+Consumo:
+${consumo}W
+
+===== FPS =====
+
+Valorant:
+${valorant} FPS
+
+Warzone:
+${warzone} FPS
+
+Fortnite:
+${fortnite} FPS
+
+===== TEMPERATURAS =====
+
+CPU:
+${tempCPU}°C
+
+GPU:
+${tempGPU}°C
+
+===== COMPATIBILIDAD =====
+
+${compatTexto}`;
+
+            document.getElementById("resultado").innerText = resultado;
+            guardarHistorial({ cpu, gpu, ram, mb, fuente, ssd, precio, valorant, warzone, fortnite, advertencias });
+        }
+
+        /* ========== HISTORIAL ========== */
+        function guardarHistorial(datos) {
+            let historial = JSON.parse(localStorage.getItem("historial_gc") || "[]");
+            datos.fecha = new Date().toLocaleString("es-MX");
+            datos.id = Date.now();
+            historial.unshift(datos);
+            if (historial.length > 10) historial = historial.slice(0, 10);
+            localStorage.setItem("historial_gc", JSON.stringify(historial));
+            renderHistorial();
+        }
+
+        function renderHistorial() {
+            let historial = JSON.parse(localStorage.getItem("historial_gc") || "[]");
+            let div = document.getElementById("historial-lista");
+            if (historial.length === 0) {
+                div.innerHTML = '<p class="no-historial">Sin configuraciones guardadas.</p>';
+                return;
+            }
+            div.innerHTML = historial.map((h, i) => `
+                <div class="historial-item">
+                    <div class="h-title">PC #${historial.length - i}</div>
+                    <div class="h-fecha">${h.fecha}</div>
+                    <div class="h-comp">
+                        CPU: ${h.cpu}<br>
+                        GPU: ${h.gpu}<br>
+                        RAM: ${h.ram}<br>
+                        MB: ${h.mb}<br>
+                        PSU: ${h.fuente}<br>
+                        SSD: ${h.ssd}<br>
+                        <span style="color:#ff4444;">$${h.precio}</span> |
+                        <span style="color:#44ff88;">Val:${h.valorant} WZ:${h.warzone} FN:${h.fortnite} FPS</span>
+                        ${h.advertencias && h.advertencias.length ? '<br><span style="color:#ffaa00;">⚠️ ' + h.advertencias.length + ' advertencia(s)</span>' : ''}
+                    </div>
+                    <div class="historial-btns">
+                        <button class="btn-cargar" onclick="cargarConfig(${i})">↩ Cargar</button>
+                        <button class="btn-borrar" onclick="borrarConfig(${i})">🗑</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function cargarConfig(index) {
+            let historial = JSON.parse(localStorage.getItem("historial_gc") || "[]");
+            let h = historial[index];
+            if (!h) return;
+            setSelectValue("cpu", h.cpu);
+            setSelectValue("gpu", h.gpu);
+            setSelectValue("ram", h.ram);
+            setSelectValue("mb", h.mb);
+            setSelectValue("fuente", h.fuente);
+            setSelectValue("ssd", h.ssd);
+            actualizarCompatLive();
+        }
+
+        function setSelectValue(id, val) {
+            let sel = document.getElementById(id);
+            for (let o of sel.options) {
+                if (o.text === val) {
+                    sel.value = o.value;
+                    return;
+                }
+            }
+        }
+
+        function borrarConfig(index) {
+            let historial = JSON.parse(localStorage.getItem("historial_gc") || "[]");
+            historial.splice(index, 1);
+            localStorage.setItem("historial_gc", JSON.stringify(historial));
+            renderHistorial();
+        }
+
+        function limpiarHistorial() {
+            if (confirm("¿Borrar todo el historial?")) {
+                localStorage.removeItem("historial_gc");
+                renderHistorial();
+            }
+        }
+
+        /* ========== LOGIN / REGISTRO ========== */
+        if (localStorage.getItem("usuarios") === null) {
+            localStorage.setItem("usuarios", JSON.stringify([{ nombre: "admin", password: "1234" }]));
+        }
+
+        function registrarUsuario() {
+            let nuevoUsuario = prompt("Crea un usuario");
+            let nuevaPassword = prompt("Crea una contraseña");
+            if (nuevoUsuario === null || nuevaPassword === null) {
+                alert("Registro cancelado");
+                return;
+            }
+            nuevoUsuario = nuevoUsuario.trim();
+            nuevaPassword = nuevaPassword.trim();
+            if (nuevoUsuario === "" || nuevaPassword === "") {
+                alert("No puedes dejar campos vacíos");
+                return;
+            }
+            if (!/^[a-zA-Z0-9]+$/.test(nuevoUsuario)) {
+                alert("El usuario NO puede tener símbolos");
+                return;
+            }
+            let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            if (usuarios.some(u => u.nombre === nuevoUsuario)) {
+                alert("Ese usuario ya existe");
+                return;
+            }
+            usuarios.push({ nombre: nuevoUsuario, password: nuevaPassword });
+            localStorage.setItem("usuarios", JSON.stringify(usuarios));
+            alert("Usuario registrado correctamente");
+        }
+
+        function iniciarSesion() {
+            let usuario = document.getElementById("usuario").value;
+            let password = document.getElementById("password").value;
+            let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            let encontrado = usuarios.find(u => u.nombre === usuario && u.password === password);
+            if (encontrado) {
+                alert("Bienvenido " + usuario);
+                document.getElementById("login").style.display = "none";
+                document.getElementById("sistema").style.display = "flex";
+                renderHistorial();
+            } else {
+                alert("Usuario o contraseña incorrectos");
+            }
+        }
+
+        function cerrarSistema() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
