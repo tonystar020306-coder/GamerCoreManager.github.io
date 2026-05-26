@@ -84,6 +84,7 @@
       <div class="docs-panel" id="tab-manual">
         <h3>📖 Manual de uso</h3>
         <ol><li>Regístrate e inicia sesión</li><li>Selecciona componentes</li><li>Presiona "ARMAR PC" para ver análisis y guardar</li><li>Usa "EXPORTAR A PDF" para generar lista de compras</li><li>Revisa tu historial a la derecha</li><li>Cambia el idioma y tema según tu preferencia</li></ol>
+        <p style="margin-top: 15px;"><strong>📄 Documentación completa:</strong> <a href="Documentacion.pdf" target="_blank" style="color: #00aaff;">Abrir manual en PDF (más detalles)</a></p>
       </div>
       <div class="docs-panel" id="tab-agradecimientos">
         <h3>🙏 Agradecimientos</h3>
@@ -180,6 +181,225 @@
     <button onclick="armarPC()" style="margin-top:10px;">⚙️ ARMAR PC</button>
     <button onclick="exportarPDF()" style="background:linear-gradient(45deg,#008866,#004433);margin-top:10px;">📄 EXPORTAR A PDF</button>
     <button onclick="abrirModalDocs()" style="background:linear-gradient(45deg,#0066aa,#003366);margin-top:8px;">📚 Aprende más sobre el proyecto</button>
+    <!-- Botón para abrir PDF externo -->
+    <button onclick="window.open('Documentacion.pdf', '_blank')" style="background:linear-gradient(45deg,#cc8800,#664400);margin-top:8px;">📄 Abrir manual completo (PDF)</button>
+    <!-- SOLO UN BOTÓN CERRAR SISTEMA -->
+    <button onclick="cerrarSistema()" style="background:linear-gradient(45deg,#333,#111);margin-top:8px;">✖ CERRAR SISTEMA</button>
+  </div>
+
+  <div class="resultado-wrap">
+    <div class="badge-gama" id="badge-gama" style="display:none;"></div>
+    <div class="cotizacion" id="cotizacion" style="display:none;">
+      <h1 style="font-size:15px;margin:0 0 14px;">💰 COTIZACIÓN</h1>
+      <div class="cot-row"><span class="cot-label">Subtotal</span><span id="cot-sub">—</span></div>
+      <div class="cot-row"><span class="cot-label">Descuento Gamer (5%)</span><span id="cot-desc" class="cot-descuento">—</span></div>
+      <div class="cot-row"><span class="cot-label">IVA (16%)</span><span id="cot-iva">—</span></div>
+      <div class="cot-row" style="margin-top:6px;border-top:2px solid var(--border-main);padding-top:12px;">
+        <span class="cot-label" style="font-size:16px;">TOTAL</span>
+        <span id="cot-total" class="cot-total">—</span>
+      </div>
+    </div>
+    <div class="resultado" id="resultado">===== GAMERCORE MANAGER =====
+
+Selecciona los componentes
+o usa el Recomendador para comenzar.</div>
+  </div>
+
+  <div class="historial-panel">
+    <h1 style="font-size:16px;margin-top:0;">📋 HISTORIAL</h1>
+    <div id="historial-lista"><p class="no-historial">Sin configuraciones guardadas.</p></div>
+    <button class="btn-limpiar" onclick="limpiarHistorial()">🗑 LIMPIAR TODO</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamerCore Manager</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<!-- SELECTOR DE IDIOMA -->
+<div id="language-selector">
+  <button id="lang-es" class="lang-btn" data-lang="es">🇪🇸 Español</button>
+  <button id="lang-en" class="lang-btn" data-lang="en">🇬🇧 English</button>
+  <button id="lang-ja" class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+</div>
+
+<!-- SLIDER TEMA -->
+<label id="theme-toggle-wrap" for="toggle-modo" title="Cambiar tema">
+  <span id="toggle-label">MODO CLARO</span>
+  <input type="checkbox" id="toggle-modo">
+  <span class="toggle-track"></span>
+</label>
+
+<!-- LOGIN -->
+<div id="login">
+  <h1>LOGIN GAMERCORE</h1>
+  <input type="text" id="usuario" placeholder="Usuario">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button onclick="iniciarSesion()">ENTRAR</button>
+  <button onclick="registrarUsuario()">REGISTRARSE</button>
+</div>
+
+<!-- MODAL RECOMENDADOR -->
+<div class="modal-overlay" id="modal-rec">
+  <div class="modal-box">
+    <h2>RECOMENDADOR</h2>
+    <p>¿Para qué usarás tu PC?</p>
+    <div class="uso-grid">
+      <button class="uso-btn" onclick="recomendarPara('gaming')"><span>🎮</span>Gaming</button>
+      <button class="uso-btn" onclick="recomendarPara('streaming')"><span>📡</span>Streaming</button>
+      <button class="uso-btn" onclick="recomendarPara('diseno')"><span>🎨</span>Diseño</button>
+      <button class="uso-btn" onclick="recomendarPara('programacion')"><span>💻</span>Programación</button>
+    </div>
+    <button class="modal-cancelar" onclick="cerrarModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL DOCUMENTACIÓN (con pestañas) -->
+<div class="modal-overlay" id="modal-docs">
+  <div class="modal-box" style="max-width: 750px; width: 90%; text-align: left;">
+    <h2>📚 Sobre GamerCore y su creador</h2>
+    <hr>
+    <div class="docs-tabs">
+      <button class="docs-tab-btn activo" data-tab="proyecto">🔧 Proyecto</button>
+      <button class="docs-tab-btn" data-tab="motivo">🎯 Motivo</button>
+      <button class="docs-tab-btn" data-tab="creador">👨‍💻 Creador</button>
+      <button class="docs-tab-btn" data-tab="tecnologia">🛠️ Tecnologías</button>
+      <button class="docs-tab-btn" data-tab="manual">📖 Manual</button>
+      <button class="docs-tab-btn" data-tab="agradecimientos">🙏 Agradecimientos</button>
+      <button class="docs-tab-btn" data-tab="licencia">⚖️ Licencia</button>
+      <button class="docs-tab-btn" data-tab="futuro">🔮 Futuras mejoras</button>
+    </div>
+    <div id="docs-contenido" style="max-height: 55vh; overflow-y: auto; padding-right: 10px;">
+      <div class="docs-panel activo" id="tab-proyecto">
+        <h3>Sobre el proyecto</h3>
+        <p><strong>GamerCore Manager</strong> es una aplicación web para entusiastas del hardware que permite armar configuraciones de PC, verificar compatibilidad entre componentes, obtener cotizaciones con impuestos y descuentos, y guardar el historial de builds en una base de datos centralizada.</p>
+        <p>Versión actual: <strong>2.0.0</strong> (Junio 2026) - Con soporte multiidioma y tema persistente.</p>
+      </div>
+      <div class="docs-panel" id="tab-motivo">
+        <h3>🎯 Motivo de la app</h3>
+        <p>Ayudar a usuarios sin experiencia a seleccionar componentes compatibles y a tener una referencia de precios y rendimiento estimado en juegos populares. También sirve como herramienta de aprendizaje.</p>
+      </div>
+      <div class="docs-panel" id="tab-creador">
+        <h3>👨‍💻 Creador</h3>
+        <p><strong>Jonathan Gerardo Vázquez Martínez</strong><br>Estudiante de <strong>Ingeniería en Sistemas Computacionales</strong> en el <strong>Tecnológico de Estudios Superiores de Ecatepec</strong>.<br>Entusiasta del hardware, el desarrollo web y las bases de datos.</p>
+      </div>
+      <div class="docs-panel" id="tab-tecnologia">
+        <h3>🛠️ Tecnologías utilizadas</h3>
+        <ul><li>Frontend: HTML5, CSS3, JS puro</li><li>Backend: Node.js + Express</li><li>BD: MySQL (XAMPP)</li><li>Autenticación: bcrypt</li><li>PDF: jsPDF + jsPDF-AutoTable</li><li>Multiidioma: sistema propio basado en JSON</li></ul>
+      </div>
+      <div class="docs-panel" id="tab-manual">
+        <h3>📖 Manual de uso</h3>
+        <ol><li>Regístrate e inicia sesión</li><li>Selecciona componentes</li><li>Presiona "ARMAR PC" para ver análisis y guardar</li><li>Usa "EXPORTAR A PDF" para generar lista de compras</li><li>Revisa tu historial a la derecha</li><li>Cambia el idioma y tema según tu preferencia</li></ol>
+        <p style="margin-top: 15px;"><strong>📄 Documentación completa:</strong> <a href="Documentacion.pdf" target="_blank" style="color: #00aaff;">Abrir manual en PDF (más detalles)</a></p>
+      </div>
+      <div class="docs-panel" id="tab-agradecimientos">
+        <h3>🙏 Agradecimientos</h3>
+        <p>A mis profesores, familia y comunidad open source por el apoyo.</p>
+      </div>
+      <div class="docs-panel" id="tab-licencia">
+        <h3>⚖️ Licencia</h3>
+          <p>Copyright © 2026 Jonathan Gerardo Vázquez Martínez.</p>
+        <p>Por la presente se concede permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el "Software"), a utilizar el Software sin restricción, incluidos, entre otros, los derechos de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del Software, y a permitir a las personas a las que se les proporcione el Software que lo hagan, sujeto a las siguientes condiciones:</p>
+        <p>El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.</p>
+        <p>EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS AUTORES O TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE NINGÚN RECLAMO, DAÑO U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O CUALQUIER OTRA FORMA, QUE SURJA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE.</p>
+        <p style="font-size: 12px; margin-top: 10px;">Esta licencia permite usar el código libremente, incluso en proyectos comerciales, siempre que se mantenga el aviso de copyright.</p>
+      </div>
+      <div class="docs-panel" id="tab-futuro">
+        <h3>🔮 Futuras mejoras</h3>
+        <ul>
+          <li>Precios reales de componentes desde base de datos actualizable.</li>
+          <li>Gráficas de rendimiento comparativo entre builds.</li>
+          <li><strong>Recomendador inteligente con IA (aprendizaje automático) para sugerir combos óptimos según presupuesto y juegos favoritos.</strong></li>
+          <li>Modo oscuro/claro persistente en el perfil del usuario (backend) ✅ Ya implementado.</li>
+          <li>Múltiples idiomas (Español, Inglés, Japonés) ✅ Ya implementado.</li>
+          <li>Compartir builds mediante enlace público.</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+      <button class="modal-cancelar" onclick="cerrarModalDocs()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SISTEMA PRINCIPAL -->
+<div class="contenedor" id="sistema">
+  <div class="panel">
+    <h1 style="font-size:17px;">GAMERCORE MANAGER</h1>
+
+    <label>CPU</label>
+    <select id="cpu">
+      <option value="">-- Seleccione un CPU --</option>
+      <option>Athlon 3000G</option><option>Ryzen 3 2200G</option><option>Ryzen 3 3200G</option><option>Ryzen 3 4100</option>
+      <option>Ryzen 5 3600</option><option>Ryzen 5 4600G</option><option>Ryzen 5 5500</option><option>Ryzen 5 5600X</option><option>Ryzen 7 5700X</option>
+      <option>Ryzen 7 5800X3D</option><option>Ryzen 7 7700X</option><option>Ryzen 7 7800X3D</option><option>Ryzen 9 7900X</option><option>Ryzen 9 7950X</option><option>Ryzen 9 9950X</option>
+      <option>Intel i3 10100F</option><option>Intel i3 12100F</option>
+      <option>Intel i5 10400F</option><option>Intel i5 12400F</option><option>Intel i5 13400F</option><option>Intel i5 14600K</option>
+      <option>Intel i7 12700K</option><option>Intel i7 13700K</option><option>Intel i7 14700K</option><option>Intel i9 13900K</option><option>Intel i9 14900K</option>
+    </select>
+
+    <label>GPU</label>
+    <select id="gpu">
+      <option value="">-- Seleccione una GPU --</option>
+      <option>GT 1030</option><option>GTX 1050 Ti</option><option>GTX 1650</option><option>GTX 1660 Super</option>
+      <option>RTX 2060</option><option>RTX 3050</option><option>RTX 3060</option><option>RTX 3060 Ti</option><option>RTX 3070</option>
+      <option>RTX 4060</option><option>RTX 4060 Ti</option><option>RTX 4070</option><option>RTX 4070 Super</option><option>RTX 4080</option><option>RTX 4090</option>
+      <option>RX 570</option><option>RX 580</option><option>RX 6400</option>
+      <option>RX 6600</option><option>RX 6700 XT</option><option>RX 6750 XT</option><option>RX 7600</option>
+      <option>RX 7700 XT</option><option>RX 7800 XT</option><option>RX 7900 XT</option><option>RX 7900 XTX</option>
+    </select>
+
+    <label>RAM</label>
+    <select id="ram">
+      <option value="">-- Seleccione una RAM --</option>
+      <option>4GB DDR4 2400MHz</option><option>8GB DDR4 2666MHz</option><option>8GB DDR4 3200MHz</option>
+      <option>16GB DDR4 3200MHz</option><option>16GB DDR4 RGB 3600MHz</option>
+      <option>32GB DDR4 3600MHz</option><option>32GB DDR5 5200MHz</option><option>32GB DDR5 RGB 6000MHz</option>
+      <option>64GB DDR5 6000MHz</option><option>64GB DDR5 RGB 7200MHz</option><option>96GB DDR5 RGB 7200MHz</option>
+    </select>
+
+    <label>MOTHERBOARD</label>
+    <select id="mb">
+      <option value="">-- Seleccione una Motherboard --</option>
+      <option>A320M</option><option>B450M</option><option>B550 Gaming</option><option>X570 AORUS</option>
+      <option>B650 Gaming Plus</option><option>X670 AORUS Elite</option>
+      <option>H510M</option><option>H610M</option><option>B660M</option><option>Z690 Gaming</option><option>Z790 ROG STRIX</option>
+    </select>
+
+    <label>FUENTE</label>
+    <select id="fuente">
+      <option value="">-- Seleccione una Fuente --</option>
+      <option>500W</option><option>550W Bronze</option><option>650W Bronze</option><option>750W Gold</option>
+      <option>850W Gold</option><option>1000W Platinum</option><option>1200W Titanium</option>
+    </select>
+
+    <label>SSD</label>
+    <select id="ssd">
+      <option value="">-- Seleccione un SSD --</option>
+      <option>120GB SATA</option><option>240GB SATA</option><option>480GB SATA</option>
+      <option>500GB NVME</option><option>1TB NVME</option><option>2TB NVME</option>
+      <option>Kingston NV2 1TB</option><option>Samsung 980 PRO 1TB</option><option>WD Black SN850X 2TB</option><option>Samsung 990 PRO 4TB</option>
+    </select>
+
+    <div id="compat-live" style="margin-top:14px;"></div>
+
+    <button onclick="abrirModal()" style="background:linear-gradient(45deg,#5500aa,#330066);margin-top:18px;">🎯 RECOMENDAR PC</button>
+    <button onclick="armarPC()" style="margin-top:10px;">⚙️ ARMAR PC</button>
+    <button onclick="exportarPDF()" style="background:linear-gradient(45deg,#008866,#004433);margin-top:10px;">📄 EXPORTAR A PDF</button>
+    <button onclick="abrirModalDocs()" style="background:linear-gradient(45deg,#0066aa,#003366);margin-top:8px;">📚 Aprende más sobre el proyecto</button>
+    <!-- Botón para abrir PDF externo -->
+    <button onclick="window.open('Documentacion.pdf', '_blank')" style="background:linear-gradient(45deg,#cc8800,#664400);margin-top:8px;">📄 Abrir manual completo (PDF)</button>
+    <!-- SOLO UN BOTÓN CERRAR SISTEMA -->
     <button onclick="cerrarSistema()" style="background:linear-gradient(45deg,#333,#111);margin-top:8px;">✖ CERRAR SISTEMA</button>
   </div>
 
